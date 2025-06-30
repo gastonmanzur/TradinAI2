@@ -9,6 +9,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/symbols', (req, res) => {
+  const files = fs.readdirSync(path.join(__dirname, 'data'));
+  const symbols = files
+    .filter(f => f.endsWith('.json'))
+    .map(f => path.basename(f, '.json'));
+  res.json(symbols);
+});
+
 
 app.get('/api/data/:symbol', (req, res) => {
   const symbol = req.params.symbol.toLowerCase();
