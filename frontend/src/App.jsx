@@ -7,6 +7,7 @@ export default function App() {
   const [data, setData] = useState([]);
   const [signals, setSignals] = useState([]);
   const [symbolsList, setSymbolsList] = useState([]);
+  const filteredSymbols = symbolsList.filter(sym => sym.toLowerCase().includes(symbol));
 
   const fetchData = async (sym) => {
     try {
@@ -14,17 +15,17 @@ export default function App() {
       setData(d.data);
       const s = await axios.get(`/api/signals/${sym}`);
       setSignals(s.data);
-    } catch (err) {
+    } catch {
       try {
         const d = await axios.get(`/api/realtime/${sym}?market=stock`);
         setData(d.data);
         setSignals([]);
-      } catch (e1) {
+      } catch {
         try {
           const d = await axios.get(`/api/realtime/${sym}?market=crypto`);
           setData(d.data);
           setSignals([]);
-        } catch (e2) {
+        } catch {
           setData([]);
           setSignals([]);
         }
@@ -56,7 +57,7 @@ export default function App() {
         placeholder="Símbolo"
       />
       <datalist id="symbols">
-        {symbolsList.map(sym => (
+        {filteredSymbols.map(sym => (
           <option key={sym} value={sym} />
         ))}
       </datalist>
