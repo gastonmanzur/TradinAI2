@@ -19,10 +19,10 @@ export default function App() {
   useEffect(() => { fetchData(symbol); }, [symbol]);
 
   return (
-    <GoogleOAuthProvider clientId="GOOGLE_CLIENT_ID">
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <div style={{ padding: '1rem' }}>
-        {user ? <p>Bienvenido {user.name}</p> :
-          <GoogleLogin onSuccess={(cred) => setUser({ name: 'Usuario Google' })} onError={() => alert('Error')} />}
+          {user ? <p>Bienvenido {user.name}</p> :
+            <GoogleLogin onSuccess={() => setUser({ name: 'Usuario Google' })} onError={() => alert('Error')} />}
         <select value={symbol} onChange={e => setSymbol(e.target.value)}>
           <option value="aapl">AAPL</option>
           <option value="goog">GOOG</option>
