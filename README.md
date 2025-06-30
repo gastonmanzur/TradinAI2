@@ -28,3 +28,7 @@ En otra terminal inicia el frontend:
 ```bash
 npm run dev --prefix frontend
 ```
+
+## Actualización automática de datos
+
+La aplicación vuelve a solicitar los datos de la API cada minuto para mantener el gráfico actualizado.
