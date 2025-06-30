@@ -20,10 +20,13 @@ export default function App() {
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <div style={{ padding: '1rem' }}>
-          {user ? <p>Bienvenido {user.name}</p> :
-            <GoogleLogin onSuccess={() => setUser({ name: 'Usuario Google' })} onError={() => alert('Error')} />}
-        <select value={symbol} onChange={e => setSymbol(e.target.value)}>
+      <div className="container-fluid p-3">
+        {user ? (
+          <p>Bienvenido {user.name}</p>
+        ) : (
+          <GoogleLogin onSuccess={() => setUser({ name: 'Usuario Google' })} onError={() => alert('Error')} />
+        )}
+        <select className="form-select my-3" value={symbol} onChange={e => setSymbol(e.target.value)}>
           <option value="aapl">AAPL</option>
           <option value="goog">GOOG</option>
         </select>
