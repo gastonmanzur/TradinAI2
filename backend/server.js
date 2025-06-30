@@ -5,6 +5,7 @@ const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
