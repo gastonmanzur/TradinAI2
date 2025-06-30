@@ -3,6 +3,7 @@ const cors = require('cors');
 // Removed authentication dependencies
 const fs = require('fs');
 const path = require('path');
+const fetch = require('node-fetch');
 require('dotenv').config();
 
 const app = express();
@@ -66,6 +67,35 @@ app.get('/api/signals/:symbol', (req, res) => {
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   const signals = calculateSignals(data);
   res.json(signals);
+});
+
+app.get('/api/realtime/:symbol', async (req, res) => {
+  const symbol = req.params.symbol.toLowerCase();
+  const market = req.query.market || 'stock';
+  try {
+    if (market === 'crypto') {
+      const url = `https://api.coingecko.com/api/v3/coins/${symbol}/ohlc?vs_currency=usd&days=1`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!Array.isArray(data)) throw new Error('invalid response');
+      res.json(data);
+    } else {
+      const url = `https://stooq.com/q/d/l/?s=${symbol}.us&i=d`;
+      const response = await fetch(url);
+      const text = await response.text();
+      const lines = text.trim().split('\n');
+      lines.shift();
+      const recent = lines.slice(-100);
+      const data = recent.map(line => {
+        const [date, open, high, low, close] = line.split(',');
+        return [new Date(date).getTime(), parseFloat(open), parseFloat(high), parseFloat(low), parseFloat(close)];
+      });
+      res.json(data);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch real-time data' });
+  }
 });
 
 const PORT = process.env.PORT || 3001;

@@ -15,8 +15,20 @@ export default function App() {
       const s = await axios.get(`/api/signals/${sym}`);
       setSignals(s.data);
     } catch (err) {
-      setData([]);
-      setSignals([]);
+      try {
+        const d = await axios.get(`/api/realtime/${sym}?market=stock`);
+        setData(d.data);
+        setSignals([]);
+      } catch (e1) {
+        try {
+          const d = await axios.get(`/api/realtime/${sym}?market=crypto`);
+          setData(d.data);
+          setSignals([]);
+        } catch (e2) {
+          setData([]);
+          setSignals([]);
+        }
+      }
     }
   };
 
