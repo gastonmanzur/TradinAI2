@@ -1,8 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const passport = require('passport');
-const session = require('express-session');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+// Removed authentication dependencies
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -11,33 +9,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
-
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'GOOGLE_CLIENT_ID';
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'GOOGLE_CLIENT_SECRET';
-
-passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-  },
-  (accessToken, refreshToken, profile, done) => {
-    return done(null, profile);
-  }
-));
-
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    res.redirect('/');
-  }
-);
 
 app.get('/api/data/:symbol', (req, res) => {
   const symbol = req.params.symbol.toLowerCase();
