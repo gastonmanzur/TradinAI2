@@ -1,35 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Chart from './Chart.jsx';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [symbol, setSymbol] = useState('aapl');
+  const [data, setData] = useState([]);
+  const [signals, setSignals] = useState([]);
+  const [user, setUser] = useState(null);
+
+  const fetchData = async (sym) => {
+    const d = await axios.get(`/api/data/${sym}`);
+    setData(d.data);
+    const s = await axios.get(`/api/signals/${sym}`);
+    setSignals(s.data);
+  };
+
+  useEffect(() => { fetchData(symbol); }, [symbol]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <GoogleOAuthProvider clientId="GOOGLE_CLIENT_ID">
+      <div style={{ padding: '1rem' }}>
+        {user ? <p>Bienvenido {user.name}</p> :
+          <GoogleLogin onSuccess={(cred) => setUser({ name: 'Usuario Google' })} onError={() => alert('Error')} />}
+        <select value={symbol} onChange={e => setSymbol(e.target.value)}>
+          <option value="aapl">AAPL</option>
+          <option value="goog">GOOG</option>
+        </select>
+        <Chart data={data} signals={signals} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </GoogleOAuthProvider>
+  );
 }
-
-export default App
