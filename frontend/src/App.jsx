@@ -23,6 +23,11 @@ export default function App() {
   useEffect(() => { fetchData(symbol); }, [symbol]);
 
   useEffect(() => {
+    const id = setInterval(() => fetchData(symbol), 60000);
+    return () => clearInterval(id);
+  }, [symbol]);
+
+  useEffect(() => {
     axios.get('/api/symbols')
       .then(res => setSymbolsList(res.data))
       .catch(() => setSymbolsList([]));
